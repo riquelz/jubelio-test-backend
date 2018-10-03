@@ -1,0 +1,33 @@
+{
+  "name": "jubelio-test-backend",
+  "version": "1.0.0",
+  "description": "API using hapi.js for CRUD in frontend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node bootstrap.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/riquelz/jubelio-test-backend.git"
+  },
+  "keywords": [
+    "jubelio"
+  ],
+  "author": "Hosea",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/riquelz/jubelio-test-backend/issues"
+  },
+  "homepage": "https://github.com/riquelz/jubelio-test-backend#readme",
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-es2015": "^6.24.1",
+    "hapi": "16.6.3",
+    "hapi-auth-jwt": "^4.0.0",
+    "jsonwebtoken": "^8.3.0",
+    "knex": "^0.15.2",
+    "pg": "^7.4.3"
+  }
+}

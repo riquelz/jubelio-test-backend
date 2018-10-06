@@ -5,6 +5,12 @@ const routes = [
     {
         path: '/products',
         method: 'GET',
+        config: {
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['access-control-allow-origin']
+            }
+        },
         handler: ( request, reply ) => {
             const getOperation = Knex( 'products' ).where( {
                 status: 'LIVE',
@@ -17,16 +23,22 @@ const routes = [
                 }
                 reply( {
                     dataCount: results.length,
-                    data: results,
-                } );
+                    products: results,
+                } ).header('Access-Control-Allow-Origin', '*');
             } ).catch( ( err ) => {
-                reply( 'server-side error' );
+                reply( 'server-side error' ).header('Access-Control-Allow-Origin', '*');
             } );
         }
     },
     {
         path: '/auth',
         method: 'POST',
+        config: {
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['access-control-allow-origin', 'x-requested-with']
+            }
+        },
         handler: ( request, reply ) => {
             const { email, password } = request.payload;
             const getOperation = Knex( 'users' ).where( {
@@ -42,20 +54,20 @@ const routes = [
                 if( user.password === password ) {
                     const token = jwt.sign( {
                         email,
-                        scope: user.name,
+                        scope: user.email,
                     }, 'vZiYpmTzqXMp8PpYXKwqc9ShQ1UhyAfy', {
                         algorithm: 'HS256',
                         expiresIn: '6h',
                     } );
                     reply( {
                         token,
-                        scope: user.name,
+                        scope: user.email,
                     } );
                 } else {
-                    reply( 'incorrect password ' + user.password );
+                    reply( 'incorrect password ' + user.password ).header('Access-Control-Allow-Origin', '*');
                 }
             } ).catch( ( err ) => {
-                reply( 'server-side error' );
+                reply( 'server-side error' ).header('Access-Control-Allow-Origin', '*');
             } );
         }
     },
@@ -63,16 +75,22 @@ const routes = [
         path: '/products',
         method: 'POST',
         config: {
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['access-control-allow-origin' ,'x-requested-with', 'Authorization']
+            },
             auth: {
                 strategy: 'token',
             }
         },
         handler: ( request, reply ) => {
-            const { product } = request.payload;
+            const { name, price, description, image } = request.payload;
+            const product = {name:name,price:price,description:description,image:image};
+
             const insertOperation = Knex( 'products' ).insert( {
                 created_by: request.auth.credentials.scope,
                 name: product.name,
-                price: product.species,
+                price: product.price,
                 image: product.image,
                 description: product.description,
                 status: 'LIVE'
@@ -80,9 +98,9 @@ const routes = [
                 reply( {
                     data: name,
                     message: 'successfully created product'
-                } );
+                } ).header('Access-Control-Allow-Origin', '*');
             } ).catch( ( err ) => {
-                reply( 'server-side error' );
+                reply( err.message ).header('Access-Control-Allow-Origin', '*');
             } );
         }
     },
@@ -91,6 +109,10 @@ const routes = [
         path: '/products/{id}',
         method: 'PUT',
         config: {
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['access-control-allow-origin' ,'x-requested-with', 'Authorization']
+            },
             auth: {
                 strategy: 'token',
             },
@@ -106,7 +128,7 @@ const routes = [
                                 reply( {
                                     error: true,
                                     errMessage: `the product with id ${ id } was not found`
-                                } ).takeover();
+                                } ).header('Access-Control-Allow-Origin', '*').takeover();
                             }
                             return reply.continue();
                         } );
@@ -115,22 +137,24 @@ const routes = [
             ],
         },
         handler: ( request, reply ) => {
-            const { id } = request.params
-                , { product }     = request.payload;
+            const { id } = request.params ;
+            const { name, price, description, image } = request.payload;
+            const product = {name:name,price:price,description:description,image:image}
+
             const insertOperation = Knex( 'products' ).where( {
                 id,
             } ).update( {
                 name: product.name,
-                price: product.species,
+                price: product.price,
                 image: product.image,
                 description: product.description,
             } ).then( ( res ) => {
 
                 reply( {
                     message: 'successfully updated product'
-                } );
+                } ).header('Access-Control-Allow-Origin', '*');
             } ).catch( ( err ) => {
-                reply( 'server-side error' );
+                reply( 'server-side error' ).header('Access-Control-Allow-Origin', '*');
             } );
         }
     },
@@ -139,6 +163,10 @@ const routes = [
         path: '/products/delete/{id}',
         method: 'PUT',
         config: {
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['access-control-allow-origin' ,'x-requested-with', 'Authorization']
+            },
             auth: {
                 strategy: 'token',
             },
@@ -154,7 +182,7 @@ const routes = [
                                 reply( {
                                     error: true,
                                     errMessage: `the product with id ${ id } was not found`
-                                } ).takeover();
+                                } ).header('Access-Control-Allow-Origin', '*').takeover();
                             }
                             return reply.continue();
                         } );
@@ -163,8 +191,7 @@ const routes = [
             ],
         },
         handler: ( request, reply ) => {
-            const { id } = request.params
-                , { product }     = request.payload;
+            const { id } = request.params;
             const insertOperation = Knex( 'products' ).where( {
                 id,
             } ).update( {
@@ -173,9 +200,9 @@ const routes = [
 
                 reply( {
                     message: 'successfully delete product'
-                } );
+                } ).header('Access-Control-Allow-Origin', '*');
             } ).catch( ( err ) => {
-                reply( 'server-side error' );
+                reply( 'server-side error' ).header('Access-Control-Allow-Origin', '*');
             } );
         }
     }

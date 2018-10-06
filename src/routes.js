@@ -31,6 +31,36 @@ const routes = [
         }
     },
     {
+        path: '/products/get/{id}',
+        method: 'GET',
+        config: {
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['access-control-allow-origin', 'x-requested-with']
+            }
+        },
+        handler: ( request, reply ) => {
+            const { id } = request.params
+
+            const getOperation = Knex( 'products' ).where( {
+                status: 'LIVE', id,
+            } ).select( 'id', 'name', 'price', 'description', 'image' ).then( ( results ) => {
+                if( !results || results.length === 0 ) {
+                    reply( {
+                        error: true,
+                        errMessage: 'no public product found',
+                    } );
+                }
+                reply( {
+                    dataCount: results.length,
+                    product: results,
+                } ).header('Access-Control-Allow-Origin', '*');
+            } ).catch( ( err ) => {
+                reply( 'server-side error' ).header('Access-Control-Allow-Origin', '*');
+            } );
+        }
+    },
+    {
         path: '/auth',
         method: 'POST',
         config: {

@@ -141,7 +141,7 @@ const routes = [
         config: {
             cors: {
                 origin: ['*'],
-                additionalHeaders: ['access-control-allow-origin' ,'x-requested-with', 'Authorization']
+                additionalHeaders: ['access-control-allow-origin' ,'x-requested-with', 'Authorization', 'content-type']
             },
             auth: {
                 strategy: 'token',

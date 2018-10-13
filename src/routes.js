@@ -14,7 +14,7 @@ const routes = [
         handler: ( request, reply ) => {
             const getOperation = Knex( 'products' ).where( {
                 status: 'LIVE',
-            } ).select( 'id', 'name', 'price', 'description', 'image' ).then( ( results ) => {
+            } ).select( 'id', 'name', 'price', 'description', 'image', 'purchase_price' ).then( ( results ) => {
                 if( !results || results.length === 0 ) {
                     reply( {
                         error: true,
@@ -44,7 +44,7 @@ const routes = [
 
             const getOperation = Knex( 'products' ).where( {
                 status: 'LIVE', id,
-            } ).select( 'id', 'name', 'price', 'description', 'image' ).then( ( results ) => {
+            } ).select( 'id', 'name', 'price', 'description', 'image', 'purchase_price' ).then( ( results ) => {
                 if( !results || results.length === 0 ) {
                     reply( {
                         error: true,
@@ -114,13 +114,14 @@ const routes = [
             }
         },
         handler: ( request, reply ) => {
-            const { name, price, description, image } = request.payload;
-            const product = {name:name,price:price,description:description,image:image};
+            const { name, price, description, image, purchase_price } = request.payload;
+            const product = {name:name,price:price,description:description,image:image,purchase_price:purchase_price};
 
             const insertOperation = Knex( 'products' ).insert( {
                 created_by: request.auth.credentials.scope,
                 name: product.name,
                 price: product.price,
+                purchase_price: product.purchase_price,
                 image: product.image,
                 description: product.description,
                 status: 'LIVE'
@@ -168,14 +169,15 @@ const routes = [
         },
         handler: ( request, reply ) => {
             const { id } = request.params ;
-            const { name, price, description, image } = request.payload;
-            const product = {name:name,price:price,description:description,image:image}
+            const { name, price, description, image, purchase_price } = request.payload;
+            const product = {name:name,price:price,description:description,image:image,purchase_price:purchase_price}
 
             const insertOperation = Knex( 'products' ).where( {
                 id,
             } ).update( {
                 name: product.name,
                 price: product.price,
+                purchase_price: product.purchase_price,
                 image: product.image,
                 description: product.description,
             } ).then( ( res ) => {
